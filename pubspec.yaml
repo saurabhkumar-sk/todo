@@ -31,7 +31,7 @@ flutter:
   fonts:
     - family: IBMPlexMonoRegular
       fonts:
-        - asset: IBMPlexMono-Regular.ttf
+        - asset: assets/fonts/IBMPlexMono-Regular.ttf
     - family: IBMPlexMonoMedium
       fonts:
         - asset: assets/fonts/IBMPlexMono-Medium.ttf

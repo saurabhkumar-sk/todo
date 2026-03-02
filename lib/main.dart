@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/app_colors.dart';
 import 'package:todo_app/routes/routes.dart';
 
 void main() {
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: AppRoutes.generateRoutes,
       title: 'Flutter Demo',
       theme: ThemeData(
-
+        iconTheme: IconThemeData(color: AppColors.primary),
         colorScheme:.fromSeed(seedColor: Colors.deepPurple),
       ),
     );
