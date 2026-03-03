@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/app_colors.dart';
+import 'package:todo_app/core/app_colors/app_colors.dart';
 import 'package:todo_app/core/app_font_family/app_font_family.dart';
 
 class TextClass extends StatelessWidget {
@@ -42,7 +42,7 @@ class TextClass extends StatelessWidget {
       maxLines: maxLines,
       overflow: overflow,
       style: TextStyle(
-        color: color ?? AppColors.primary,
+        color: color ?? Theme.of(context).colorScheme.onSurface,
         fontFamily: fontFamily ?? AppFontFamily.iBMPlexMonoMedium,
         fontSize: fontSize,
         fontWeight: fontWeight,
