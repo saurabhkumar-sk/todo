@@ -4,9 +4,7 @@ import 'package:todo_app/main.dart';
 
 class ThemeProvider extends ChangeNotifier{
 
-  final Box _box = Hive.box(storageKey);
-
-  static const String _themeKey = "themeMode";
+  final Box _box = Hive.box(themeBoxKey);
 
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
@@ -16,7 +14,7 @@ class ThemeProvider extends ChangeNotifier{
   }
 
   void _loadTheme(){
-    final save = _box.get(_themeKey);
+    final save = _box.get(themeBoxKey);
     if(save != null){
       _themeMode = ThemeMode.values[save];
     }
@@ -27,7 +25,7 @@ class ThemeProvider extends ChangeNotifier{
 
   void setTheme(ThemeMode mode){
     _themeMode = mode;
-    _box.put(_themeKey, mode.index);
+    _box.put(themeBoxKey, mode.index);
     notifyListeners();
   }
 

@@ -6,15 +6,23 @@ import 'package:todo_app/routes/routes.dart';
 import 'package:todo_app/theme/app_theme.dart';
 import 'package:todo_app/theme/theme_provider.dart';
 
+import 'screens/all_task/controller/all_task_provider.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 const String storageKey = "myTodos";
+const String themeBoxKey = "themeMode";
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+
   await Hive.openBox(storageKey);
+  await Hive.openBox(themeBoxKey);
+
   runApp(MultiProvider(
       providers: [
-        ChangeNotifierProvider(create:  (context) => ThemeProvider())
+        ChangeNotifierProvider(create:  (context) => ThemeProvider()),
+        ChangeNotifierProvider(create:  (context) => AllTaskProvider())
       ],
       child: const MyApp(),
   ),
@@ -31,6 +39,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context,themeProvider,_) {
           return MaterialApp(
+            navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
             initialRoute: AppRoutes.allTaskScreen,
             onGenerateRoute: AppRoutes.generateRoutes,
