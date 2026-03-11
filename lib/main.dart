@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
-            initialRoute: AppRoutes.allTaskScreen,
+            initialRoute: AppRoutes.splashScreen,
             onGenerateRoute: AppRoutes.generateRoutes,
             title: 'My Todo App',
             themeMode: themeProvider.themeMode,
