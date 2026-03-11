@@ -17,7 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool? isPop;
   final Color? backgroundClr;
   final Function()? leadingOnTap;
-
+  final PreferredSizeWidget? bottom;
   const CustomAppBar({
     super.key,
     this.leading,
@@ -32,6 +32,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundClr,
     this.isPop = true,
     this.leadingOnTap,
+    this.bottom,
   });
 
   @override
@@ -58,6 +59,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: bgColor,
       scrolledUnderElevation: 0.0,
       automaticallyImplyLeading: false,
+      bottom: bottom,
       leading: isLeading
           ? leading ??
           InkWell(

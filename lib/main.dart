@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/routes/routes.dart';
+import 'package:todo_app/screens/all_task/model/todo_model.dart';
 import 'package:todo_app/theme/app_theme.dart';
 import 'package:todo_app/theme/theme_provider.dart';
 
@@ -15,8 +16,10 @@ const String themeBoxKey = "themeMode";
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-
-  await Hive.openBox(storageKey);
+  
+  Hive.registerAdapter(TodoModelAdapter());
+  
+  await Hive.openBox<TodoModel>(storageKey);
   await Hive.openBox(themeBoxKey);
 
   runApp(MultiProvider(
