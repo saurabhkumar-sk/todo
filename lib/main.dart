@@ -1,9 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_app/firebase_options.dart';
 import 'package:todo_app/routes/routes.dart';
 import 'package:todo_app/screens/all_task/model/todo_model.dart';
+import 'package:todo_app/screens/login/login_screen.dart';
 import 'package:todo_app/theme/app_theme.dart';
 import 'package:todo_app/theme/theme_provider.dart';
 
@@ -16,6 +19,13 @@ const String themeBoxKey = "themeMode";
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  try{
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }catch(e){
+    debugPrint("unable to initialized firebase ${e.toString()}");
+  }
   
   Hive.registerAdapter(TodoModelAdapter());
   
@@ -44,7 +54,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
-            initialRoute: AppRoutes.splashScreen,
+            home: LoginScreen(),
+            // initialRoute: AppRoutes.splashScreen,
             onGenerateRoute: AppRoutes.generateRoutes,
             title: 'My Todo App',
             themeMode: themeProvider.themeMode,
