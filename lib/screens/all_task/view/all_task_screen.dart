@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/common/custom_appbar.dart';
 import 'package:todo_app/common/custom_textform_field.dart';
@@ -6,6 +7,9 @@ import 'package:todo_app/common/text_class.dart';
 import 'package:todo_app/core/app_font_family/app_font_family.dart';
 import 'package:todo_app/routes/routes.dart';
 import 'package:todo_app/screens/all_task/controller/all_task_provider.dart';
+
+import '../../../main.dart';
+import '../model/todo_model.dart';
 
 class AllTaskScreen extends StatelessWidget {
   const AllTaskScreen({super.key});
@@ -188,12 +192,171 @@ class AllTaskScreen extends StatelessWidget {
     );
   }
 
+  // Widget todosList(BuildContext context, {required bool isCompleted}) {
+  //   final colorScheme = Theme.of(context).colorScheme;
+  //
+  //   return Consumer<AllTaskProvider>(
+  //     builder: (context, provider, _) {
+  //       final todos = provider.todos.where((todo) => todo.isCompleted == isCompleted).toList();
+  //
+  //       if (todos.isEmpty) {
+  //         return Center(
+  //           child: TextClass(
+  //             title: isCompleted ? "No Completed Todos" : "No Pending Todos",
+  //           ),
+  //         );
+  //       }
+  //
+  //       return ListView.separated(
+  //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+  //         itemCount: todos.length,
+  //         separatorBuilder: (_, __) => const SizedBox(height: 10),
+  //         itemBuilder: (context, index) {
+  //           final todo = todos.reversed.toList()[index];
+  //           final reversedIndex = provider.todos.indexOf(todo);
+  //
+  //           return Opacity(
+  //             opacity: todo.isCompleted ? 0.4 : 1,
+  //             child: Container(
+  //               decoration: BoxDecoration(
+  //                 borderRadius: BorderRadius.circular(10),
+  //                 color: colorScheme.surface,
+  //                 border: Border.all(color: colorScheme.primary),
+  //                 boxShadow: [
+  //                   BoxShadow(
+  //                     color: Colors.black.withOpacity(.05),
+  //                     blurRadius: 4,
+  //                     offset: const Offset(0, 2),
+  //                   ),
+  //                 ],
+  //               ),
+  //               child: Padding(
+  //                 padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
+  //                 child: Row(
+  //                   children: [
+  //                     Expanded(
+  //                       child: Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           TextClass(
+  //                             title: todo.title ?? "",
+  //                             fontWeight: FontWeight.w600,
+  //                             maxLines: 2,
+  //                             overflow: TextOverflow.ellipsis,
+  //                             color: colorScheme.onSurface,
+  //                           ),
+  //                           if (todo.description != null && todo.description.toString().isNotEmpty) ...[
+  //                             const SizedBox(height: 4),
+  //                             TextClass(
+  //                               title: todo.description ?? "",
+  //                               fontSize: 12,
+  //                               maxLines: 2,
+  //                               overflow: TextOverflow.ellipsis,
+  //                               color: colorScheme.onSurface.withOpacity(.7),
+  //                             ),
+  //                           ],
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     const SizedBox(width: 8),
+  //                     InkWell(
+  //                       onTap: () => provider.toggleCompleted(reversedIndex),
+  //                       child: Icon(
+  //                         todo.isCompleted? Icons.check_box_rounded : Icons.check_box_outline_blank_outlined,
+  //                         size: 22,
+  //                         color: colorScheme.primary,
+  //                       ),
+  //                     ),
+  //                     PopupMenuButton<String>(
+  //                       offset: const Offset(-30, 22),
+  //                       padding: EdgeInsets.zero,
+  //                       iconSize: 22,
+  //                       onSelected: (value) {
+  //                         if (value == "edit") {
+  //                           provider.titleController.text = todo.title ?? "";
+  //                           provider.descriptionController.text = todo.description ?? "";
+  //                           addTaskBottomSheet(context, colorScheme, editIndex: reversedIndex);
+  //                         } else if (value == "delete") {
+  //                           provider.deleteTodos(reversedIndex);
+  //                         }
+  //                       },
+  //                       itemBuilder: (context) => [
+  //                         if (!todo.isCompleted)
+  //                           const PopupMenuItem(
+  //                             value: "edit",
+  //                             child: Text("Edit"),
+  //                           ),
+  //                         const PopupMenuItem(
+  //                           value: "delete",
+  //                           child: Text("Delete"),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
   Widget todosList(BuildContext context, {required bool isCompleted}) {
     final colorScheme = Theme.of(context).colorScheme;
+    final loginType = Hive.box(loginBoxKey).get("isLoggedIn", defaultValue: "skip");
 
+    // 🔥 GOOGLE USER → FIRESTORE
+    if (loginType == "google") {
+      return Consumer<AllTaskProvider>(
+        builder: (context, provider, _) {
+          return StreamBuilder<List<TodoModel>>(
+            stream: provider.getFirestoreTodos(),
+            builder: (context, snapshot) {
+
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final todos = snapshot.data!
+                  .where((e) => e.isCompleted == isCompleted)
+                  .toList();
+
+              if (todos.isEmpty) {
+                return Center(
+                  child: TextClass(
+                    title: isCompleted
+                        ? "No Completed Todos"
+                        : "No Pending Todos",
+                  ),
+                );
+              }
+
+              return ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                itemCount: todos.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  final todo = todos[index];
+
+                  return ListTile(
+                    title: Text(todo.title ?? ""),
+                    subtitle: Text(todo.description ?? ""),
+                  );
+                },
+              );
+            },
+          );
+        },
+      );
+    }
+
+    // 🔥 SKIP USER → HIVE (तुम्हारा existing code)
     return Consumer<AllTaskProvider>(
       builder: (context, provider, _) {
-        final todos = provider.todos.where((todo) => todo.isCompleted == isCompleted).toList();
+        final todos = provider.todos
+            .where((todo) => todo.isCompleted == isCompleted)
+            .toList();
 
         if (todos.isEmpty) {
           return Center(
@@ -211,86 +374,14 @@ class AllTaskScreen extends StatelessWidget {
             final todo = todos.reversed.toList()[index];
             final reversedIndex = provider.todos.indexOf(todo);
 
-            return Opacity(
-              opacity: todo.isCompleted ? 0.4 : 1,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: colorScheme.surface,
-                  border: Border.all(color: colorScheme.primary),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextClass(
-                              title: todo.title ?? "",
-                              fontWeight: FontWeight.w600,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              color: colorScheme.onSurface,
-                            ),
-                            if (todo.description != null && todo.description.toString().isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              TextClass(
-                                title: todo.description ?? "",
-                                fontSize: 12,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                color: colorScheme.onSurface.withOpacity(.7),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      InkWell(
-                        onTap: () => provider.toggleCompleted(reversedIndex),
-                        child: Icon(
-                          todo.isCompleted? Icons.check_box_rounded : Icons.check_box_outline_blank_outlined,
-                          size: 22,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                      PopupMenuButton<String>(
-                        offset: const Offset(-30, 22),
-                        padding: EdgeInsets.zero,
-                        iconSize: 22,
-                        onSelected: (value) {
-                          if (value == "edit") {
-                            provider.titleController.text = todo.title ?? "";
-                            provider.descriptionController.text = todo.description ?? "";
-                            addTaskBottomSheet(context, colorScheme, editIndex: reversedIndex);
-                          } else if (value == "delete") {
-                            provider.deleteTodos(reversedIndex);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          if (!todo.isCompleted)
-                            const PopupMenuItem(
-                              value: "edit",
-                              child: Text("Edit"),
-                            ),
-                          const PopupMenuItem(
-                            value: "delete",
-                            child: Text("Delete"),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+            return ListTile(
+              title: Text(todo.title ?? ""),
+              subtitle: Text(todo.description ?? ""),
+              trailing: IconButton(
+                icon: Icon(todo.isCompleted
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank),
+                onPressed: () => provider.toggleCompleted(reversedIndex),
               ),
             );
           },
@@ -387,23 +478,38 @@ class AllTaskScreen extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       ElevatedButton(
-                        onPressed: () {
-                          if (provider.formKey.currentState?.validate() ??
-                              false) {
-                            if(editIndex != null){
-                              provider.updateTodos(index: editIndex,
-                                  title:   provider.titleController.text,
-                                  description: provider.descriptionController.text,
-                                  isCompleted:provider.isCompleted,
-                              );
-                            }else {
-                              provider.addTodos(
-                                title:provider.titleController.text,
-                                description: provider.descriptionController.text,
-                                isCompleted:provider.isCompleted,
-                              );
-                            }
+                        // onPressed: () {
+                        //   if (provider.formKey.currentState?.validate() ??
+                        //       false) {
+                        //     if(editIndex != null){
+                        //       provider.updateTodos(index: editIndex,
+                        //           title:   provider.titleController.text,
+                        //           description: provider.descriptionController.text,
+                        //           isCompleted:provider.isCompleted,
+                        //       );
+                        //     }else {
+                        //       provider.addTodos(
+                        //         title:provider.titleController.text,
+                        //         description: provider.descriptionController.text,
+                        //         isCompleted:provider.isCompleted,
+                        //       );
+                        //     }
+                        //
+                        //   }
+                        // }
+                        onPressed: () async {
+                          if (provider.formKey.currentState?.validate() ?? false) {
 
+                            if (editIndex != null) {
+                              await provider.updateTodos(
+                                index: editIndex,
+                                title: provider.titleController.text,
+                                description: provider.descriptionController.text,
+                                isCompleted: provider.isCompleted,
+                              );
+                            } else {
+                              await provider.addTodo(context);
+                            }
                           }
                         },
                         child: const Text("Save"),

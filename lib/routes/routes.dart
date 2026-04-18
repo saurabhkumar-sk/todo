@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/screens/all_task/view/all_task_screen.dart';
+import 'package:todo_app/screens/login/login_screen.dart';
 import 'package:todo_app/screens/profile/profile_screen.dart';
 import 'package:todo_app/screens/profile/sub_screens/change_theme_screen.dart';
 import 'package:todo_app/screens/splash/splash.dart';
@@ -9,6 +10,7 @@ class AppRoutes {
   static const String allTaskScreen = "allTaskScreen";
   static const String profileScreen = "profileScreen";
   static const String changeThemeScreen = "changeThemeScreen";
+  static const String loginScreen = "loginScreen";
 
   static Route<dynamic> generateRoutes(RouteSettings setting) {
     switch (setting.name) {
@@ -24,6 +26,9 @@ class AppRoutes {
 
       case changeThemeScreen:
               return MaterialPageRoute(builder: (context) => const ChangeThemeScreen());
+
+      case loginScreen:
+              return MaterialPageRoute(builder: (context) => const LoginScreen());
 
       default:
         return MaterialPageRoute(

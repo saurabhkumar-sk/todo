@@ -15,10 +15,12 @@ import 'screens/all_task/controller/all_task_provider.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 const String storageKey = "myTodos";
 const String themeBoxKey = "themeMode";
+const String loginBoxKey = "isLogin";
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  // await Hive.deleteBoxFromDisk(storageKey);
   try{
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -31,6 +33,7 @@ void main() async{
   
   await Hive.openBox<TodoModel>(storageKey);
   await Hive.openBox(themeBoxKey);
+  await Hive.openBox(loginBoxKey);
 
   runApp(MultiProvider(
       providers: [
@@ -54,8 +57,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
-            home: LoginScreen(),
-            // initialRoute: AppRoutes.splashScreen,
+            // home: LoginScreen(),
+            initialRoute: AppRoutes.splashScreen,
             onGenerateRoute: AppRoutes.generateRoutes,
             title: 'My Todo App',
             themeMode: themeProvider.themeMode,

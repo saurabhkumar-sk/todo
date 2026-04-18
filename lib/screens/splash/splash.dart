@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/routes/routes.dart';
@@ -16,10 +17,29 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(seconds: 4),() {
-        Navigator.pushNamed(navigatorKey.currentContext!, AppRoutes.allTaskScreen);
-      },);
+      checkLogin();
     },);
+  }
+
+  Future<void> checkLogin() async {
+    await Future.delayed(const Duration(seconds: 4));
+
+    final box = Hive.box(loginBoxKey);
+     final isLoggedIn = box.get('isLoggedIn',defaultValue: "skip");
+     debugPrint("isLoggedIn $isLoggedIn");
+
+    if (isLoggedIn == "google" || isLoggedIn == "skip") {
+      Navigator.pushReplacementNamed(
+        navigatorKey.currentContext!,
+        AppRoutes.allTaskScreen,
+      );
+    } else {
+      Navigator.pushReplacementNamed(
+        navigatorKey.currentContext!,
+        AppRoutes.loginScreen,
+      );
+    }
+
   }
 
   @override

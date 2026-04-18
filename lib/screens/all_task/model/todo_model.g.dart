@@ -20,19 +20,25 @@ class TodoModelAdapter extends TypeAdapter<TodoModel> {
       title: fields[0] as String?,
       description: fields[1] as String?,
       isCompleted: fields[2] as bool,
+      firestoreId: fields[3] as String?,
+      isSynced: fields[4] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, TodoModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
       ..write(obj.description)
       ..writeByte(2)
-      ..write(obj.isCompleted);
+      ..write(obj.isCompleted)
+      ..writeByte(3)
+      ..write(obj.firestoreId)
+      ..writeByte(4)
+      ..write(obj.isSynced);
   }
 
   @override
